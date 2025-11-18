@@ -917,6 +917,15 @@
       "version": "v1.7",
       "completion": 1.0,
       "details": "完成启动/扫描/映射/审查/任务板5个阶段,30分钟产出5份文档"
+    },
+    {
+      "id": "ARCH-DEPLOY-001",
+      "name": "GitHub仓库发布",
+      "type": "部署发布",
+      "file": "git repository",
+      "version": "v1.7",
+      "completion": 1.0,
+      "details": "完整代码上传GitHub (544文件,150,684行) - https://github.com/eva-wanxin-git/taskflow-v1.7-monorepo"
     }
   ],
   "partial": [
@@ -1340,7 +1349,7 @@
     }
   ],
   "summary": {
-    "total": 114,
+    "total": 115,
     "by_version": {
       "v1.0": 20,
       "v1.7": 70,
