@@ -4514,8 +4514,45 @@ AI代码管家等待您的提问...
             
             const sortedEvents = [...events].reverse();
             
-            // 事件类型图标映射
+            // REQ-010 事件类型图标映射（28种事件类型）
             const eventTypeMap = {{
+                // 任务生命周期事件 (9种)
+                'task_created': {{ icon: '✦', class: 'task' }},
+                'task_dispatched': {{ icon: '→', class: 'task' }},
+                'task_received': {{ icon: '↓', class: 'communication' }},
+                'task_started': {{ icon: '▸', class: 'start' }},
+                'task_progress': {{ icon: '◐', class: 'task' }},
+                'task_completed': {{ icon: '✓', class: 'review' }},
+                'task_reviewed': {{ icon: '◎', class: 'review' }},
+                'task_approved': {{ icon: '✓', class: 'review' }},
+                'task_rejected': {{ icon: '✗', class: 'review' }},
+
+                // 功能生命周期事件 (5种)
+                'feature_developed': {{ icon: '◆', class: 'development' }},
+                'feature_tested': {{ icon: '◇', class: 'api' }},
+                'feature_integrated': {{ icon: '⊕', class: 'task' }},
+                'feature_deployed': {{ icon: '↑', class: 'task' }},
+                'feature_verified': {{ icon: '✓', class: 'review' }},
+
+                // 问题生命周期事件 (4种)
+                'issue_discovered': {{ icon: '⚠', class: 'requirement' }},
+                'issue_diagnosed': {{ icon: '◉', class: 'task' }},
+                'issue_fixed': {{ icon: '✓', class: 'review' }},
+                'issue_verified': {{ icon: '✓', class: 'review' }},
+
+                // 协作事件 (10种)
+                'user_feedback': {{ icon: '●', class: 'communication' }},
+                'architect_analysis': {{ icon: '◉', class: 'task' }},
+                'engineer_implementation': {{ icon: '◆', class: 'development' }},
+                'code_review': {{ icon: '◎', class: 'review' }},
+                'meeting': {{ icon: '●', class: 'communication' }},
+                'decision_made': {{ icon: '◉', class: 'task' }},
+                'deployment': {{ icon: '↑', class: 'task' }},
+                'incident': {{ icon: '!', class: 'requirement' }},
+                'handoff': {{ icon: '⇄', class: 'task' }},
+                'notification': {{ icon: '◆', class: 'communication' }},
+
+                // 兼容旧格式
                 'start': {{ icon: '▸', class: 'start' }},
                 'communication': {{ icon: '●', class: 'communication' }},
                 'task_breakdown': {{ icon: '✓', class: 'task' }},
@@ -4527,7 +4564,6 @@ AI代码管家等待您的提问...
                 'api': {{ icon: '◇', class: 'api' }},
                 'requirement_change': {{ icon: '⚠', class: 'requirement' }},
                 'receive_task': {{ icon: '↓', class: 'communication' }},
-                'handoff': {{ icon: '⇄', class: 'task' }},
                 'warning': {{ icon: '!', class: 'requirement' }},
                 'decision': {{ icon: '◉', class: 'task' }}
             }};

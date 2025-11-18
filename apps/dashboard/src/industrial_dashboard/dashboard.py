@@ -1027,7 +1027,7 @@ class IndustrialDashboard:
         async def get_architect_monitor():
             """
             获取架构师监控数据
-            
+
             Returns:
                 {
                     "token_usage": {
@@ -1041,7 +1041,7 @@ class IndustrialDashboard:
                     "events": [
                         {
                             "time": "10:30:15",
-                            "icon": "🎯",
+                            "type": "task_created",
                             "content": "接手项目总架构师+产品经理"
                         }
                     ],
@@ -1052,9 +1052,8 @@ class IndustrialDashboard:
                 # 使用绝对路径，确保找到数据文件
                 base_dir = Path(__file__).parent.parent.parent  # 回到apps/dashboard/
                 data_file = base_dir / "automation-data" / "architect_monitor.json"
-                events_file = base_dir / "automation-data" / "architect_events.json"
-                
-                # 读取基础监控数据
+
+                # 读取基础监控数据（Token、状态、提示词）
                 data = {}
                 if data_file.exists():
                     with open(data_file, 'r', encoding='utf-8') as f:
@@ -1065,15 +1064,33 @@ class IndustrialDashboard:
                         "status": {"text": "初始化", "reviewed_count": 0},
                         "prompt": "暂无提示词"
                     }
-                
-                # 读取事件流数据
-                if events_file.exists():
-                    with open(events_file, 'r', encoding='utf-8') as f:
-                        events_data = json.load(f)
-                        data["events"] = events_data.get("events", [])
-                else:
-                    data["events"] = []
-                
+
+                # 🆕 从REQ-010事件流系统读取最新事件（而不是JSON文件）
+                try:
+                    recent_events = self.event_stream_provider.get_recent_events(hours=24, limit=20)
+                    # 转换事件格式以适配前端需求
+                    formatted_events = []
+                    for event in recent_events:
+                        formatted_events.append({
+                            "time": event.get("event_time", "")[:8] if "event_time" in event else "--:--:--",  # HH:MM:SS
+                            "type": event.get("event_type", "unknown"),
+                            "content": event.get("description", ""),
+                            "actor": event.get("actor", ""),
+                            "severity": event.get("severity", "info")
+                        })
+                    data["events"] = formatted_events
+                    print(f"[架构师监控] 从事件流系统加载了 {len(formatted_events)} 个事件")
+                except Exception as event_error:
+                    print(f"[架构师监控] 从事件流加载失败: {event_error}，尝试从JSON文件加载...")
+                    # Fallback到JSON文件（兼容性）
+                    events_file = base_dir / "automation-data" / "architect_events.json"
+                    if events_file.exists():
+                        with open(events_file, 'r', encoding='utf-8') as f:
+                            events_data = json.load(f)
+                            data["events"] = events_data.get("events", [])
+                    else:
+                        data["events"] = []
+
                 return JSONResponse(content=data)
             except Exception as e:
                 return JSONResponse(content={"error": str(e)}, status_code=500)
