@@ -1,0 +1,436 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务看板 - TASKFLOW</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --black: #000000;
+            --white: #FFFFFF;
+            --red: #D32F2F;
+            --gray-900: #212121;
+            --gray-700: #616161;
+            --gray-500: #9E9E9E;
+            --gray-300: #E0E0E0;
+            --gray-100: #F5F5F5;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+            background: var(--white);
+            color: var(--black);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px;
+        }
+        
+        /* 头部 */
+        .header {
+            border-bottom: 2px solid var(--black);
+            padding-bottom: 32px;
+            margin-bottom: 48px;
+        }
+        
+        .brand {
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            color: var(--gray-700);
+            letter-spacing: 0.5px;
+        }
+        
+        .project-info {
+            display: flex;
+            gap: 24px;
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--gray-500);
+        }
+        
+        .project-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* 端口信息卡片 */
+        .port-card {
+            background: var(--gray-100);
+            border-left: 4px solid var(--red);
+            padding: 24px;
+            margin-bottom: 48px;
+        }
+        
+        .port-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 12px;
+        }
+        
+        .port-content {
+            font-size: 13px;
+            color: var(--gray-700);
+            line-height: 2;
+        }
+        
+        .port-link {
+            color: var(--red);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .port-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+        
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--gray-300);
+            padding: 32px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--black);
+            font-family: 'SF Mono', 'Consolas', monospace;
+            margin-bottom: 12px;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: var(--gray-700);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* 进度条 */
+        .progress-section {
+            margin-bottom: 48px;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        .progress-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--black);
+        }
+        
+        .progress-percent {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--red);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--gray-300);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--red);
+            transition: width 0.3s ease;
+        }
+        
+        /* 区域标题 */
+        .section {
+            margin-bottom: 48px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--gray-300);
+        }
+        
+        /* Phase卡片 */
+        .phase-card {
+            background: var(--white);
+            border: 1px solid var(--gray-300);
+            margin-bottom: 24px;
+        }
+        
+        .phase-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-300);
+            background: var(--gray-100);
+        }
+        
+        .phase-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--black);
+        }
+        
+        .phase-status {
+            display: inline-block;
+            margin-left: 12px;
+            padding: 4px 12px;
+            font-size: 11px;
+            border-radius: 2px;
+        }
+        
+        .phase-status.completed {
+            background: var(--black);
+            color: var(--white);
+        }
+        
+        .phase-status.pending {
+            background: var(--gray-300);
+            color: var(--gray-700);
+        }
+        
+        .phase-content {
+            padding: 24px;
+        }
+        
+        .phase-tasks {
+            font-size: 13px;
+            color: var(--gray-700);
+            line-height: 2;
+        }
+        
+        /* 刷新提示 */
+        .refresh-notice {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: var(--black);
+            color: var(--white);
+            padding: 16px 24px;
+            font-size: 12px;
+            border: 1px solid var(--gray-300);
+            letter-spacing: 0.5px;
+        }
+        
+        /* 打印样式 */
+        @media print {
+            .refresh-notice { display: none; }
+            body { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <div class="brand">任务所·FLOW</div>
+            <div class="subtitle">用对话，开工；用流程，收工 | AI任务协作与进度监控系统</div>
+            <div class="project-info">
+                <div class="project-info-item">
+                    <span>📦</span>
+                    <span>项目: TASKFLOW</span>
+                </div>
+                <div class="project-info-item">
+                    <span>🔌</span>
+                    <span>端口: 8870</span>
+                </div>
+                <div class="project-info-item">
+                    <span>⏰</span>
+                    <span>更新: 2025-11-18 16:43</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 端口信息 -->
+        <div class="port-card">
+            <div class="port-title">📍 端口信息</div>
+            <div class="port-content">
+                <strong>Dashboard端口</strong>: 8870（自动分配，避免冲突）<br>
+                <strong>访问地址</strong>: <a href="http://localhost:8870" class="port-link" target="_blank">http://localhost:8870</a><br>
+                <strong>端口范围</strong>: 8870-8899（任务所·Flow专用）<br>
+                <strong>端口管理</strong>: 通过PortManager自动分配
+            </div>
+        </div>
+        
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">18</div>
+                <div class="stat-label">总任务数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">10</div>
+                <div class="stat-label">待处理</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">0</div>
+                <div class="stat-label">进行中</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">8</div>
+                <div class="stat-label">已完成</div>
+            </div>
+        </div>
+        
+        <!-- 进度条 -->
+        <div class="progress-section">
+            <div class="progress-header">
+                <div class="progress-label">整体进度</div>
+                <div class="progress-percent">44%</div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 44%"></div>
+            </div>
+        </div>
+        
+        <!-- Phase状态 -->
+        <div class="section">
+            <div class="section-title">里程碑状态</div>
+            
+            <div class="phase-card">
+                <div class="phase-header">
+                    <span class="phase-title">Phase 1-2: Monorepo骨架 + 知识库数据库</span>
+                    <span class="phase-status completed">✓ 已完成</span>
+                </div>
+                <div class="phase-content">
+                    <div class="phase-tasks">
+                        ✓ 创建Monorepo目录结构（50+目录）<br>
+                        ✓ 编写ADR-0001架构决策<br>
+                        ✓ 创建12表知识库Schema<br>
+                        ✓ 数据库初始化（1项目+5组件+5工具）
+                    </div>
+                </div>
+            </div>
+            
+            <div class="phase-card">
+                <div class="phase-header">
+                    <span class="phase-title">Phase A-B: AI Prompts系统</span>
+                    <span class="phase-status completed">✓ 已完成</span>
+                </div>
+                <div class="phase-content">
+                    <div class="phase-tasks">
+                        ✓ 4套AI System Prompts（25000字）<br>
+                        ✓ ArchitectOrchestrator服务（400行）<br>
+                        ✓ 6个API端点定义<br>
+                        ✓ 完整的协作指南
+                    </div>
+                </div>
+            </div>
+            
+            <div class="phase-card">
+                <div class="phase-header">
+                    <span class="phase-title">Phase C: API集成</span>
+                    <span class="phase-status pending">⏳ 待开始</span>
+                </div>
+                <div class="phase-content">
+                    <div class="phase-tasks">
+                        ☐ TASK-C.1: 创建FastAPI主应用（2h）<br>
+                        ☐ TASK-C.2: 集成数据库（3h）<br>
+                        ☐ TASK-C.3: 端到端测试（1.5h）
+                    </div>
+                </div>
+            </div>
+            
+            <div class="phase-card">
+                <div class="phase-header">
+                    <span class="phase-title">Phase D-E: 代码迁移 + 测试</span>
+                    <span class="phase-status pending">⏳ 可延后</span>
+                </div>
+                <div class="phase-content">
+                    <div class="phase-tasks">
+                        ☐ 迁移models到core-domain（2h）<br>
+                        ☐ 迁移state_manager到infra（3h）<br>
+                        ☐ 完整功能测试（2h）<br>
+                        <span style="color: var(--gray-500);">（架构师建议：可延后到Phase C后）</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 下一步行动 -->
+        <div class="section">
+            <div class="section-title">🎯 下一步行动（Day 2）</div>
+            <div class="port-card" style="border-left-color: #FF9800;">
+                <div class="port-title">立即开始：Phase C - API集成</div>
+                <div class="port-content">
+                    <strong>优先级</strong>: 🔴 P0（Critical）<br>
+                    <strong>预估时间</strong>: 6.5小时<br>
+                    <strong>核心价值</strong>: 让架构师API真正可用<br>
+                    <br>
+                    <strong>具体任务</strong>:<br>
+                    1. TASK-C.1: 创建main.py（2h）<br>
+                    2. TASK-C.2: 集成数据库（3h）<br>
+                    3. TASK-C.3: E2E测试（1.5h）<br>
+                    <br>
+                    <strong>建议执行者</strong>: 全栈工程师·李明<br>
+                    <br>
+                    <a href="docs/tasks/task-board.md" class="port-link">📋 查看完整任务详情</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 快速链接 -->
+        <div class="section">
+            <div class="section-title">🔗 快速链接</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                <a href="docs/arch/architecture-inventory.md" style="display: block; padding: 16px; border: 1px solid var(--gray-300); text-decoration: none; color: var(--black);">
+                    📐 架构清单
+                </a>
+                <a href="docs/arch/architect-workflow.md" style="display: block; padding: 16px; border: 1px solid var(--gray-300); text-decoration: none; color: var(--black);">
+                    🔄 工作流程
+                </a>
+                <a href="docs/ai/" style="display: block; padding: 16px; border: 1px solid var(--gray-300); text-decoration: none; color: var(--black);">
+                    🤖 AI Prompts
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 刷新提示 -->
+    <div class="refresh-notice">
+        每30秒自动刷新 | 16:43:04
+    </div>
+    
+    <script>
+        // 30秒自动刷新
+        setTimeout(function() {
+            location.reload();
+        }, 30000);
+        
+        console.log('任务看板加载完成');
+        console.log('项目: TASKFLOW');
+        console.log('端口: 8870');
+    </script>
+</body>
+</html>
+    

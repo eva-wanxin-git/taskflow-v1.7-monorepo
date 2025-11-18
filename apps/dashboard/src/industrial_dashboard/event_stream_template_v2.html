@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>事件流可视化 v2.0 - 任务所·Flow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Consolas', 'Monaco', 'SF Mono', monospace;
+            background: #FFFDF7;  /* 浅黄背景 - 工业美学 */
+            color: #212121;
+            padding: 40px 20px;
+        }
+        
+        .event-stream-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        /* 标题区 */
+        .page-header {
+            margin-bottom: 32px;
+            border-bottom: 3px solid #000;
+            padding-bottom: 16px;
+        }
+        
+        .page-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #000;
+            letter-spacing: -1px;
+        }
+        
+        .page-subtitle {
+            font-size: 14px;
+            color: #616161;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        /* 搜索栏 */
+        .search-bar {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: white;
+            border: 2px solid #000;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            border: 1px solid #bdbdbd;
+            background: #fafafa;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #000;
+            background: white;
+        }
+        
+        /* 筛选器 */
+        .event-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 20px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-top: 3px solid #000;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .filter-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #616161;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .filter-select {
+            padding: 10px 12px;
+            border: 1px solid #bdbdbd;
+            background: white;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        
+        .filter-select:hover {
+            border-color: #000;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #000;
+        }
+        
+        /* 统计卡片 */
+        .event-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            padding: 20px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            transition: box-shadow 0.2s;
+        }
+        
+        .stat-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .stat-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: #000;
+            line-height: 1;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #757575;
+            margin-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* 事件列表 */
+        .events-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 12px 0;
+            border-bottom: 2px solid #000;
+        }
+        
+        .events-count {
+            font-size: 14px;
+            font-weight: 600;
+            color: #424242;
+        }
+        
+        .refresh-indicator {
+            font-size: 12px;
+            color: #757575;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .refresh-indicator.loading::before {
+            content: "⟳";
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .event-list-container {
+            position: relative;
+            min-height: 400px;
+        }
+        
+        .event-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        /* 事件卡片 */
+        .event-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-left: 5px solid #000;
+            padding: 20px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .event-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateX(2px);
+        }
+        
+        /* 事件类型配色 */
+        .event-item.category-task { border-left-color: #537696; }
+        .event-item.category-issue { border-left-color: #985239; }
+        .event-item.category-decision { border-left-color: #d4a373; }
+        .event-item.category-deployment { border-left-color: #87a96b; }
+        .event-item.category-system { border-left-color: #5d6d7e; }
+        .event-item.category-general { border-left-color: #9e9e9e; }
+        
+        /* 严重性配色增强 */
+        .event-item.severity-critical {
+            background: #ffebee;
+            border-left-width: 6px;
+        }
+        
+        .event-item.severity-error {
+            background: #fff3e0;
+        }
+        
+        .event-item.severity-warning {
+            background: #fffde7;
+        }
+        
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+        
+        .event-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+            flex: 1;
+        }
+        
+        .event-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .event-badge {
+            padding: 3px 10px;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        
+        /* 徽章配色 */
+        .badge-task { background: #e3f2fd; border-color: #537696; color: #537696; }
+        .badge-issue { background: #fbe9e7; border-color: #985239; color: #985239; }
+        .badge-decision { background: #fff3e0; border-color: #d4a373; color: #d4a373; }
+        .badge-deployment { background: #f1f8e9; border-color: #87a96b; color: #87a96b; }
+        .badge-system { background: #eceff1; border-color: #5d6d7e; color: #5d6d7e; }
+        
+        .badge-critical { background: #ffcdd2; border-color: #c62828; color: #c62828; }
+        .badge-error { background: #ffe0b2; border-color: #ef6c00; color: #ef6c00; }
+        .badge-warning { background: #fff9c4; border-color: #f57f17; color: #f57f17; }
+        .badge-info { background: #e8eaf6; border-color: #3f51b5; color: #3f51b5; }
+        
+        .event-description {
+            font-size: 14px;
+            color: #424242;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+        
+        /* 事件详情（展开区域） */
+        .event-details {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px dashed #e0e0e0;
+            animation: slideDown 0.2s ease-out;
+        }
+        
+        .event-item.expanded .event-details {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+            }
+        }
+        
+        .detail-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 12px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        
+        .detail-label {
+            color: #757575;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+        
+        .detail-value {
+            color: #212121;
+            word-break: break-word;
+        }
+        
+        .detail-json {
+            background: #f5f5f5;
+            padding: 12px;
+            border-left: 3px solid #bdbdbd;
+            font-size: 12px;
+            overflow-x: auto;
+            margin-top: 8px;
+        }
+        
+        .event-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #9e9e9e;
+        }
+        
+        .event-actor {
+            font-weight: 600;
+            color: #616161;
+        }
+        
+        .event-time {
+            font-size: 11px;
+        }
+        
+        .expand-button {
+            margin-left: auto;
+            padding: 4px 12px;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            font-size: 11px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .expand-button:hover {
+            background: #000;
+            color: white;
+            border-color: #000;
+        }
+        
+        /* 按钮 */
+        .btn {
+            padding: 12px 24px;
+            border: 2px solid #000;
+            background: #000;
+            color: #fff;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background: #424242;
+            border-color: #424242;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #000;
+        }
+        
+        .btn-secondary:hover {
+            background: #f5f5f5;
+        }
+        
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #9e9e9e;
+            font-size: 14px;
+        }
+        
+        .loading::before {
+            content: "⟳";
+            font-size: 32px;
+            display: block;
+            margin-bottom: 16px;
+            animation: spin 1s linear infinite;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #9e9e9e;
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .empty-state-hint {
+            font-size: 13px;
+            color: #bdbdbd;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .event-filters {
+                grid-template-columns: 1fr;
+            }
+            
+            .event-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .detail-row {
+                grid-template-columns: 1fr;
+                gap: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="event-stream-container">
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <h1 class="page-title">📊 事件流 · Event Stream</h1>
+            <p class="page-subtitle">Real-time Project Activity Monitor</p>
+        </div>
+        
+        <!-- 搜索栏 -->
+        <div class="search-bar">
+            <input 
+                type="text" 
+                class="search-input" 
+                id="searchInput" 
+                placeholder="🔍 搜索事件标题或描述... (Search events)"
+            />
+        </div>
+        
+        <!-- 筛选器 -->
+        <div class="event-filters">
+            <div class="filter-group">
+                <label class="filter-label">分类 Category</label>
+                <select class="filter-select" id="filterCategory">
+                    <option value="">全部 All</option>
+                    <option value="task">任务 Task</option>
+                    <option value="issue">问题 Issue</option>
+                    <option value="decision">决策 Decision</option>
+                    <option value="deployment">部署 Deployment</option>
+                    <option value="system">系统 System</option>
+                    <option value="general">常规 General</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">操作者 Actor</label>
+                <select class="filter-select" id="filterActor">
+                    <option value="">全部 All</option>
+                    <!-- 动态加载 -->
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">严重性 Severity</label>
+                <select class="filter-select" id="filterSeverity">
+                    <option value="">全部 All</option>
+                    <option value="info">信息 Info</option>
+                    <option value="warning">警告 Warning</option>
+                    <option value="error">错误 Error</option>
+                    <option value="critical">严重 Critical</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">时间范围 Time</label>
+                <select class="filter-select" id="filterHours">
+                    <option value="1">1小时 1h</option>
+                    <option value="6">6小时 6h</option>
+                    <option value="24" selected>24小时 24h</option>
+                    <option value="72">3天 3d</option>
+                    <option value="168">7天 7d</option>
+                    <option value="720">30天 30d</option>
+                </select>
+            </div>
+            
+            <div class="filter-group" style="justify-content: flex-end;">
+                <button class="btn" onclick="loadEvents()">刷新 Refresh</button>
+            </div>
+        </div>
+        
+        <!-- 统计卡片 -->
+        <div class="event-stats" id="eventStats">
+            <div class="stat-card">
+                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-label">总事件 Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statTask">0</div>
+                <div class="stat-label">任务 Task</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statIssue">0</div>
+                <div class="stat-label">问题 Issue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statCritical">0</div>
+                <div class="stat-label">严重 Critical</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statFiltered">0</div>
+                <div class="stat-label">已筛选 Filtered</div>
+            </div>
+        </div>
+        
+        <!-- 事件列表头部 -->
+        <div class="events-header">
+            <div class="events-count" id="eventsCount">加载中...</div>
+            <div class="refresh-indicator" id="refreshIndicator">
+                <span id="refreshStatus">就绪</span>
+            </div>
+        </div>
+        
+        <!-- 事件列表 -->
+        <div class="event-list-container">
+            <div class="event-list" id="eventList">
+                <div class="loading">正在加载事件流...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ========================================================================
+        // 全局状态
+        // ========================================================================
+        
+        let allEvents = [];
+        let filteredEvents = [];
+        let isLoading = false;
+        let autoRefreshInterval = null;
+        let searchTimeout = null;
+        
+        // ========================================================================
+        // 初始化
+        // ========================================================================
+        
+        function init() {
+            // 加载初始数据
+            loadStats();
+            loadActors();
+            loadEvents();
+            
+            // 监听筛选器变化
+            document.querySelectorAll('.filter-select').forEach(select => {
+                select.addEventListener('change', () => {
+                    applyFilters();
+                    loadEvents();
+                });
+            });
+            
+            // 监听搜索输入
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    applyFilters();
+                }, 300);
+            });
+            
+            // 启动自动刷新（每5秒）
+            startAutoRefresh();
+            
+            console.log('[EventStream] 初始化完成');
+        }
+        
+        // ========================================================================
+        // 数据加载
+        // ========================================================================
+        
+        async function loadEvents() {
+            if (isLoading) return;
+            
+            isLoading = true;
+            updateRefreshIndicator('loading');
+            
+            try {
+                const category = document.getElementById('filterCategory').value;
+                const actor = document.getElementById('filterActor').value;
+                const severity = document.getElementById('filterSeverity').value;
+                const hours = document.getElementById('filterHours').value;
+                
+                const params = new URLSearchParams();
+                if (category) params.append('category', category);
+                if (actor) params.append('actor', actor);
+                if (severity) params.append('severity', severity);
+                params.append('hours', hours);
+                params.append('limit', '1000');  // 支持1000+事件
+                
+                const response = await fetch(`/api/events/stream?${params}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    allEvents = data.events || [];
+                    applyFilters();
+                    updateRefreshIndicator('success');
+                } else {
+                    throw new Error(data.message || 'Failed to load events');
+                }
+            } catch (error) {
+                console.error('[EventStream] 加载失败:', error);
+                showError('加载事件失败: ' + error.message);
+                updateRefreshIndicator('error');
+            } finally {
+                isLoading = false;
+            }
+        }
+        
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/events/stats');
+                const data = await response.json();
+                
+                if (data.success && data.stats) {
+                    updateStats(data.stats);
+                }
+            } catch (error) {
+                console.error('[EventStream] 统计加载失败:', error);
+            }
+        }
+        
+        async function loadActors() {
+            try {
+                const hours = document.getElementById('filterHours').value;
+                const response = await fetch(`/api/events/actors?hours=${hours}`);
+                const data = await response.json();
+                
+                if (data.success && data.actors) {
+                    updateActorsDropdown(data.actors);
+                }
+            } catch (error) {
+                console.error('[EventStream] 操作者列表加载失败:', error);
+            }
+        }
+        
+        // ========================================================================
+        // 筛选和搜索
+        // ========================================================================
+        
+        function applyFilters() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            
+            // 应用搜索筛选
+            filteredEvents = allEvents.filter(event => {
+                if (searchText) {
+                    const title = (event.title || '').toLowerCase();
+                    const description = (event.description || '').toLowerCase();
+                    if (!title.includes(searchText) && !description.includes(searchText)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+            
+            // 渲染结果
+            renderEvents(filteredEvents);
+            
+            // 更新筛选统计
+            document.getElementById('statFiltered').textContent = filteredEvents.length;
+        }
+        
+        // ========================================================================
+        // 渲染
+        // ========================================================================
+        
+        function renderEvents(events) {
+            const listEl = document.getElementById('eventList');
+            const countEl = document.getElementById('eventsCount');
+            
+            // 更新计数
+            countEl.textContent = `显示 ${events.length} 个事件`;
+            
+            // 空状态
+            if (events.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-text">暂无事件</div>
+                        <div class="empty-state-hint">尝试调整筛选条件或时间范围</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 使用虚拟滚动（简化版：只渲染前100个，滚动到底部加载更多）
+            const visibleEvents = events.slice(0, 100);
+            
+            listEl.innerHTML = visibleEvents.map(event => renderEventCard(event)).join('');
+            
+            // 绑定展开/折叠事件
+            listEl.querySelectorAll('.event-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    // 如果点击的是展开按钮，不触发卡片点击
+                    if (e.target.classList.contains('expand-button')) {
+                        return;
+                    }
+                    item.classList.toggle('expanded');
+                });
+            });
+        }
+        
+        function renderEventCard(event) {
+            const category = event.event_category || event.category || 'general';
+            const severity = event.severity || 'info';
+            const actor = event.actor || 'system';
+            const title = event.title || '无标题';
+            const description = event.description || '';
+            const time = formatTime(event.occurred_at);
+            const relativeTime = getRelativeTime(event.occurred_at);
+            
+            return `
+                <div class="event-item category-${category} severity-${severity}" data-id="${event.id}">
+                    <div class="event-header">
+                        <div class="event-title">${escapeHtml(title)}</div>
+                        <div class="event-meta">
+                            <span class="event-badge badge-${category}">${getCategoryLabel(category)}</span>
+                            <span class="event-badge badge-${severity}">${getSeverityLabel(severity)}</span>
+                        </div>
+                    </div>
+                    
+                    ${description ? `<div class="event-description">${escapeHtml(description)}</div>` : ''}
+                    
+                    <div class="event-footer">
+                        <span class="event-actor">👤 ${escapeHtml(actor)}</span>
+                        <span class="event-time">🕐 ${relativeTime} (${time})</span>
+                        <button class="expand-button" onclick="event.stopPropagation(); this.closest('.event-item').classList.toggle('expanded')">
+                            详情 Details
+                        </button>
+                    </div>
+                    
+                    <!-- 详情展开区域 -->
+                    <div class="event-details">
+                        <div class="detail-row">
+                            <div class="detail-label">事件ID</div>
+                            <div class="detail-value"><code>${event.id}</code></div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">事件类型</div>
+                            <div class="detail-value"><code>${event.event_type}</code></div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">项目ID</div>
+                            <div class="detail-value">${event.project_id || '-'}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">来源</div>
+                            <div class="detail-value">${getSourceLabel(event.source)}</div>
+                        </div>
+                        ${event.related_entity_type ? `
+                        <div class="detail-row">
+                            <div class="detail-label">关联实体</div>
+                            <div class="detail-value">${event.related_entity_type}: ${event.related_entity_id}</div>
+                        </div>
+                        ` : ''}
+                        ${event.tags && event.tags.length > 0 ? `
+                        <div class="detail-row">
+                            <div class="detail-label">标签</div>
+                            <div class="detail-value">${event.tags.map(tag => `<span class="event-badge">${tag}</span>`).join(' ')}</div>
+                        </div>
+                        ` : ''}
+                        ${event.data ? `
+                        <div class="detail-row">
+                            <div class="detail-label">事件数据</div>
+                            <div class="detail-value">
+                                <pre class="detail-json">${JSON.stringify(event.data, null, 2)}</pre>
+                            </div>
+                        </div>
+                        ` : ''}
+                        <div class="detail-row">
+                            <div class="detail-label">创建时间</div>
+                            <div class="detail-value">${formatTime(event.created_at)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function updateStats(stats) {
+            document.getElementById('statTotal').textContent = stats.total_events || 0;
+            document.getElementById('statTask').textContent = stats.task_events || 0;
+            document.getElementById('statIssue').textContent = stats.issue_events || 0;
+            document.getElementById('statCritical').textContent = stats.critical_events || 0;
+        }
+        
+        function updateActorsDropdown(actors) {
+            const select = document.getElementById('filterActor');
+            // 清空现有选项（保留"全部"）
+            select.innerHTML = '<option value="">全部 All</option>';
+            
+            // 添加操作者选项
+            Object.entries(actors).forEach(([actor, count]) => {
+                const option = document.createElement('option');
+                option.value = actor;
+                option.textContent = `${actor} (${count})`;
+                select.appendChild(option);
+            });
+        }
+        
+        function updateRefreshIndicator(status) {
+            const indicator = document.getElementById('refreshIndicator');
+            const statusEl = document.getElementById('refreshStatus');
+            
+            indicator.classList.remove('loading');
+            
+            switch (status) {
+                case 'loading':
+                    indicator.classList.add('loading');
+                    statusEl.textContent = '刷新中...';
+                    break;
+                case 'success':
+                    statusEl.textContent = '就绪';
+                    break;
+                case 'error':
+                    statusEl.textContent = '错误';
+                    break;
+            }
+        }
+        
+        // ========================================================================
+        // 工具函数
+        // ========================================================================
+        
+        function formatTime(isoString) {
+            if (!isoString) return '-';
+            const date = new Date(isoString);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+        
+        function getRelativeTime(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            if (diffMins < 1) return '刚刚';
+            if (diffMins < 60) return `${diffMins}分钟前`;
+            
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `${diffHours}小时前`;
+            
+            const diffDays = Math.floor(diffHours / 24);
+            if (diffDays < 7) return `${diffDays}天前`;
+            
+            return `${Math.floor(diffDays / 7)}周前`;
+        }
+        
+        function getCategoryLabel(category) {
+            const labels = {
+                task: '任务',
+                issue: '问题',
+                decision: '决策',
+                deployment: '部署',
+                system: '系统',
+                general: '常规'
+            };
+            return labels[category] || category;
+        }
+        
+        function getSeverityLabel(severity) {
+            const labels = {
+                info: 'INFO',
+                warning: 'WARN',
+                error: 'ERROR',
+                critical: 'CRIT'
+            };
+            return labels[severity] || severity.toUpperCase();
+        }
+        
+        function getSourceLabel(source) {
+            const labels = {
+                system: '系统 System',
+                user: '用户 User',
+                ai: 'AI助手 AI',
+                external: '外部 External'
+            };
+            return labels[source] || source;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function showError(message) {
+            const listEl = document.getElementById('eventList');
+            listEl.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚠️</div>
+                    <div class="empty-state-text">加载失败</div>
+                    <div class="empty-state-hint">${escapeHtml(message)}</div>
+                </div>
+            `;
+        }
+        
+        // ========================================================================
+        // 自动刷新
+        // ========================================================================
+        
+        function startAutoRefresh() {
+            // 每5秒自动刷新
+            autoRefreshInterval = setInterval(() => {
+                if (!isLoading) {
+                    loadStats();
+                    loadEvents();
+                }
+            }, 5000);
+            
+            console.log('[EventStream] 自动刷新已启动 (5秒间隔)');
+        }
+        
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+                console.log('[EventStream] 自动刷新已停止');
+            }
+        }
+        
+        // ========================================================================
+        // 页面卸载时清理
+        // ========================================================================
+        
+        window.addEventListener('beforeunload', () => {
+            stopAutoRefresh();
+        });
+        
+        // ========================================================================
+        // 启动应用
+        // ========================================================================
+        
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
+

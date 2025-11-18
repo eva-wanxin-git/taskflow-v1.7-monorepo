@@ -1,0 +1,14 @@
+{
+  "modules": [
+    "src\\automation\\knowledge_base_initializer.py",
+    "src\\automation\\project_scanner.py",
+    "src\\industrial_dashboard\\adapters.py",
+    "src\\industrial_dashboard\\data_provider.py"
+  ],
+  "classes": [
+    "StateManagerAdapter类",
+    "DataProvider类"
+  ],
+  "functions": [],
+  "last_scanned": "2025-11-18T17:48:03.511359"
+}

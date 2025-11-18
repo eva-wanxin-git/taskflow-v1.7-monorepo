@@ -1,0 +1,29 @@
+{
+  "last_updated": "2025-11-18T18:39:18.192823",
+  "features": [
+    {
+      "name": "API接口 - knowledge_base_initializer",
+      "file": "src\\automation\\knowledge_base_initializer.py",
+      "type": "后端API",
+      "status": "已实现"
+    },
+    {
+      "name": "API接口 - project_scanner",
+      "file": "src\\automation\\project_scanner.py",
+      "type": "后端API",
+      "status": "已实现"
+    },
+    {
+      "name": "StateManagerAdapter类",
+      "file": "src\\industrial_dashboard\\adapters.py",
+      "type": "核心模块",
+      "status": "已实现"
+    },
+    {
+      "name": "DataProvider类",
+      "file": "src\\industrial_dashboard\\data_provider.py",
+      "type": "核心模块",
+      "status": "已实现"
+    }
+  ]
+}

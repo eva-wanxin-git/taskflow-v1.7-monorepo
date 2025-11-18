@@ -1,0 +1,50 @@
+{
+  "last_updated": "2025-11-18T18:02:49.559617",
+  "components": [
+    {
+      "id": "taskflow-api",
+      "name": "API Service",
+      "type": "backend",
+      "status": "部分实现",
+      "completion": 0.1,
+      "path": "apps/api/",
+      "description": "FastAPI服务，缺main.py入口"
+    },
+    {
+      "id": "taskflow-dashboard",
+      "name": "Dashboard",
+      "type": "frontend",
+      "status": "已实现",
+      "completion": 1.0,
+      "path": "apps/dashboard/",
+      "description": "工业美学可视化面板"
+    },
+    {
+      "id": "taskflow-core",
+      "name": "Core Domain",
+      "type": "package",
+      "status": "待实现",
+      "completion": 0,
+      "path": "packages/core-domain/",
+      "description": "领域模型层，目录为空"
+    },
+    {
+      "id": "taskflow-infra",
+      "name": "Infrastructure",
+      "type": "package",
+      "status": "待实现",
+      "completion": 0,
+      "path": "packages/infra/",
+      "description": "基础设施层，待迁移StateManager"
+    },
+    {
+      "id": "taskflow-algorithms",
+      "name": "Algorithms",
+      "type": "package",
+      "status": "待实现",
+      "completion": 0,
+      "path": "packages/algorithms/",
+      "description": "算法库，目录为空"
+    }
+  ]
+}

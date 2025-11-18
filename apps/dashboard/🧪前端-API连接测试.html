@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端-API连接测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 24px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background: #fafafa;
+        }
+        
+        .card h2 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status.ok {
+            background: #4caf50;
+        }
+        
+        .status.error {
+            background: #f44336;
+        }
+        
+        .status.loading {
+            background: #ff9800;
+        }
+        
+        .test-button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 15px;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        .test-button:hover {
+            background: #1976d2;
+        }
+        
+        .test-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            background: white;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .result.ok {
+            border-left-color: #4caf50;
+            background: #f1f8f4;
+        }
+        
+        .result.error {
+            border-left-color: #f44336;
+            background: #fdf3f2;
+        }
+        
+        .result.loading {
+            border-left-color: #ff9800;
+            background: #fffbf0;
+        }
+        
+        .result code {
+            display: block;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #333;
+        }
+        
+        .console {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .console-line {
+            margin: 3px 0;
+            line-height: 1.5;
+        }
+        
+        .console-line.info {
+            color: #4fc3f7;
+        }
+        
+        .console-line.success {
+            color: #81c784;
+        }
+        
+        .console-line.error {
+            color: #e57373;
+        }
+        
+        .console-line.warning {
+            color: #ffb74d;
+        }
+        
+        .summary {
+            background: #f0f4ff;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .summary h3 {
+            color: #2196f3;
+            margin-bottom: 10px;
+        }
+        
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        
+        .check-item .check {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .check-item .check.ok {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .check-item .check.error {
+            background: #f44336;
+            color: white;
+        }
+        
+        .check-item .check.pending {
+            background: #ccc;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 前端-API连接测试工具</h1>
+        
+        <div class="grid">
+            <!-- 左侧: 连接测试 -->
+            <div class="card">
+                <h2>
+                    <span class="status" id="statusApi"></span>
+                    API连接测试
+                </h2>
+                
+                <button class="test-button" onclick="testApiConnection()">
+                    测试API连接
+                </button>
+                
+                <div id="apiResult"></div>
+            </div>
+            
+            <!-- 右侧: 前端测试 -->
+            <div class="card">
+                <h2>
+                    <span class="status" id="statusFrontend"></span>
+                    前端数据加载
+                </h2>
+                
+                <button class="test-button" onclick="testFrontendLoad()">
+                    测试数据加载
+                </button>
+                
+                <div id="frontendResult"></div>
+            </div>
+        </div>
+        
+        <!-- 控制台输出 -->
+        <div class="card">
+            <h2>📋 实时日志</h2>
+            <div class="console" id="console"></div>
+        </div>
+        
+        <!-- 总结 -->
+        <div class="summary">
+            <h3>✓ 检查清单</h3>
+            <div class="check-item">
+                <div class="check" id="check1">?</div>
+                <span id="check1Text">API服务运行中</span>
+            </div>
+            <div class="check-item">
+                <div class="check" id="check2">?</div>
+                <span id="check2Text">前端可加载数据</span>
+            </div>
+            <div class="check-item">
+                <div class="check" id="check3">?</div>
+                <span id="check3Text">CORS配置正确</span>
+            </div>
+            <div class="check-item">
+                <div class="check" id="check4">?</div>
+                <span id="check4Text">数据格式正确</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:8800/api/conversations';
+        const LOCAL_URL = '/automation-data/architect-conversations.json';
+        
+        function log(message, type = 'info') {
+            const console = document.getElementById('console');
+            const line = document.createElement('div');
+            line.className = `console-line ${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            line.textContent = `[${timestamp}] ${message}`;
+            
+            console.appendChild(line);
+            console.scrollTop = console.scrollHeight;
+        }
+        
+        function setCheck(number, status) {
+            const check = document.getElementById(`check${number}`);
+            check.className = `check ${status}`;
+            check.textContent = status === 'ok' ? '✓' : status === 'error' ? '✗' : '?';
+        }
+        
+        async function testApiConnection() {
+            log('开始测试API连接...', 'info');
+            
+            const resultDiv = document.getElementById('apiResult');
+            resultDiv.className = 'result loading';
+            resultDiv.innerHTML = '<code>测试中...</code>';
+            
+            document.getElementById('statusApi').className = 'status loading';
+            
+            try {
+                log(`请求地址: ${API_URL}`, 'info');
+                
+                const response = await fetch(API_URL, {
+                    method: 'GET',
+                    headers: {'Content-Type': 'application/json'}
+                });
+                
+                log(`HTTP状态码: ${response.status}`, response.status === 200 ? 'success' : 'warning');
+                
+                const data = await response.json();
+                
+                if (response.status === 200) {
+                    log('API连接成功！', 'success');
+                    log(`获取会话数量: ${data.count || data.sessions?.length || 0}`, 'success');
+                    
+                    resultDiv.className = 'result ok';
+                    resultDiv.innerHTML = `<code>${JSON.stringify(data, null, 2)}</code>`;
+                    
+                    document.getElementById('statusApi').className = 'status ok';
+                    setCheck(1, 'ok');
+                    setCheck(3, 'ok');
+                    setCheck(4, 'ok');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+            } catch (error) {
+                log(`API连接失败: ${error.message}`, 'error');
+                
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<code>错误: ${error.message}\n\n请确保API服务已启动:\npython apps/api/start_api.py --port 8800</code>`;
+                
+                document.getElementById('statusApi').className = 'status error';
+                setCheck(1, 'error');
+                setCheck(3, 'pending');
+                
+                // 尝试加载本地文件
+                log('尝试加载本地文件...', 'info');
+                await testLocalFile();
+            }
+        }
+        
+        async function testLocalFile() {
+            try {
+                log(`请求地址: ${LOCAL_URL}`, 'info');
+                
+                const response = await fetch(LOCAL_URL);
+                const data = await response.json();
+                
+                log(`本地文件加载成功: ${data.sessions?.length || 0} 个会话`, 'success');
+                
+            } catch (error) {
+                log(`本地文件加载失败: ${error.message}`, 'warning');
+            }
+        }
+        
+        async function testFrontendLoad() {
+            log('开始测试前端数据加载...', 'info');
+            
+            const resultDiv = document.getElementById('frontendResult');
+            resultDiv.className = 'result loading';
+            resultDiv.innerHTML = '<code>加载中...</code>';
+            
+            document.getElementById('statusFrontend').className = 'status loading';
+            
+            try {
+                // 尝试从API加载
+                log('尝试从API加载数据...', 'info');
+                
+                let response;
+                try {
+                    response = await fetch(API_URL);
+                } catch (apiError) {
+                    log('API不可用，尝试本地文件...', 'warning');
+                    response = await fetch(LOCAL_URL);
+                }
+                
+                const data = await response.json();
+                
+                // 处理两种格式
+                let sessions = [];
+                if (data.success !== undefined) {
+                    // API格式
+                    sessions = data.sessions || [];
+                    log('识别为API格式响应', 'info');
+                } else {
+                    // 本地JSON格式
+                    sessions = data.sessions || [];
+                    log('识别为本地JSON格式', 'info');
+                }
+                
+                if (sessions.length > 0) {
+                    log(`成功加载 ${sessions.length} 个会话`, 'success');
+                    
+                    resultDiv.className = 'result ok';
+                    resultDiv.innerHTML = `<code>
+✓ 加载成功！
+
+会话统计:
+- 总数: ${sessions.length}
+- 活跃: ${sessions.filter(s => s.status === 'active').length}
+- 完成: ${sessions.filter(s => s.status === 'completed').length}
+
+第一个会话:
+${JSON.stringify(sessions[0], null, 2)}
+                    </code>`;
+                    
+                    document.getElementById('statusFrontend').className = 'status ok';
+                    setCheck(2, 'ok');
+                } else {
+                    log('未找到任何会话', 'warning');
+                    
+                    resultDiv.className = 'result loading';
+                    resultDiv.innerHTML = '<code>⚠ 暂无会话数据\n\n这是正常的 - 你可以通过API创建新会话</code>';
+                    
+                    document.getElementById('statusFrontend').className = 'status loading';
+                    setCheck(2, 'pending');
+                }
+                
+            } catch (error) {
+                log(`前端加载失败: ${error.message}`, 'error');
+                
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<code>错误: ${error.message}\n\n请检查:\n1. API是否在运行\n2. 本地JSON文件是否存在\n3. 浏览器控制台是否有错误</code>`;
+                
+                document.getElementById('statusFrontend').className = 'status error';
+                setCheck(2, 'error');
+            }
+        }
+        
+        // 页面加载时自动测试
+        window.addEventListener('load', () => {
+            log('页面已加载，准备进行自动测试...', 'info');
+            setTimeout(() => {
+                testApiConnection();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
+

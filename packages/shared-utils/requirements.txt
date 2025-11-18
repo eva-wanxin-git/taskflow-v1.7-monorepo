@@ -1,0 +1,8 @@
+# Token同步工具依赖
+
+# Token计数（OpenAI官方库）
+tiktoken>=0.5.0
+
+# 剪贴板操作
+pyperclip>=1.8.2
+

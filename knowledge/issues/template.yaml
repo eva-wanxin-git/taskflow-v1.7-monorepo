@@ -1,0 +1,59 @@
+# 问题记录模板
+# 用法: 复制此文件并重命名为 YYYY-NNN-short-title.yaml
+
+id: "2025-001"  # 年份-序号
+title: "问题标题（简短描述）"
+project: "taskflow-main"  # 项目ID
+component: "taskflow-api"  # 组件ID（可选）
+task: "phase1-task1"  # 关联任务ID（可选）
+
+# 严重程度
+severity: "medium"  # critical | high | medium | low
+
+# 当前状态
+status: "open"  # open | in_progress | resolved | closed
+
+# 问题描述
+description: |
+  详细描述问题的现象、影响和背景
+  
+  可以包含：
+  - 错误信息
+  - 截图链接
+  - 复现步骤
+
+# 发现信息
+discovered:
+  date: "2025-11-18"
+  by: "开发者名"
+  environment: "dev"  # dev | staging | prod
+
+# 影响范围
+impact:
+  - "用户无法xxx"
+  - "系统性能下降"
+  
+# 根本原因（如已知）
+root_cause: |
+  如果已分析出根本原因，在此说明
+
+# 解决方案（如已解决）
+resolution: |
+  如何解决的，修改了哪些文件
+
+resolved:
+  date: "2025-11-18"
+  by: "开发者名"
+  solution_id: "sol-001"  # 关联解决方案ID
+
+# 相关链接
+links:
+  - "https://github.com/xxx/issues/123"
+  - "文档链接"
+
+# 标签
+tags:
+  - "bug"
+  - "api"
+  - "performance"
+

@@ -1,0 +1,11 @@
+{
+  "milestones": [
+    {
+      "id": "m1",
+      "name": "项目初始化",
+      "description": "知识库建立，架构师就位",
+      "target_date": "2025-11-18",
+      "status": "completed"
+    }
+  ]
+}

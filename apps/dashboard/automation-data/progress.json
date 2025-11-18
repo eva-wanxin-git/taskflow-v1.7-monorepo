@@ -1,0 +1,50 @@
+{
+  "project_name": "任务所·Flow v1.7",
+  "version": "v1.7.0-alpha",
+  "overall_progress": 60,
+  "phases": [
+    {
+      "name": "Phase 1: Monorepo骨架",
+      "progress": 100,
+      "status": "completed"
+    },
+    {
+      "name": "Phase 2: 知识库数据库",
+      "progress": 100,
+      "status": "completed"
+    },
+    {
+      "name": "Phase A: AI文档系统",
+      "progress": 100,
+      "status": "completed"
+    },
+    {
+      "name": "Phase B: 架构师服务",
+      "progress": 100,
+      "status": "completed"
+    },
+    {
+      "name": "Phase C: API集成",
+      "progress": 0,
+      "status": "blocked"
+    },
+    {
+      "name": "Phase D: 代码迁移",
+      "progress": 0,
+      "status": "pending"
+    },
+    {
+      "name": "Phase E: 测试验证",
+      "progress": 0,
+      "status": "pending"
+    }
+  ],
+  "stats": {
+    "total_tasks": 5,
+    "completed": 0,
+    "in_progress": 0,
+    "pending": 5,
+    "blocked": 0
+  },
+  "updated_at": "2025-11-18T18:27:33.171362"
+}

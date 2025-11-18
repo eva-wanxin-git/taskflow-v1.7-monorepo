@@ -1,0 +1,58 @@
+{
+  "sessions": [
+    {
+      "session_id": "conv-001",
+      "title": "任务所v1.7架构设计",
+      "project_id": "TASKFLOW",
+      "model": "claude-3-5-sonnet",
+      "status": "active",
+      "total_tokens": 45000,
+      "messages_count": 32,
+      "created_at": "2025-11-18 20:00:00",
+      "updated_at": "2025-11-18 23:30:00",
+      "participants": ["用户", "架构师AI"],
+      "summary": "讨论任务所v1.7的Monorepo架构设计，包括目录结构、数据库Schema、AI文档系统等核心模块。",
+      "messages": [],
+      "started_at": "2025-11-18T20:00:00",
+      "last_active": "2025-11-18T23:30:00",
+      "tags": ["architecture", "design", "monorepo"]
+    },
+    {
+      "session_id": "conv-002",
+      "title": "集成部署和自动化实现",
+      "project_id": "TASKFLOW",
+      "model": "claude-3-5-sonnet",
+      "status": "active",
+      "total_tokens": 180000,
+      "messages_count": 85,
+      "created_at": "2025-11-19 00:00:00",
+      "updated_at": "2025-11-19 04:00:00",
+      "participants": ["用户", "架构师AI"],
+      "summary": "完成REQ-010事件流系统集成，实现Dashboard自动化部署和多功能集成测试。",
+      "messages": [],
+      "tags": ["integration", "automation", "deployment"]
+    },
+    {
+      "session_id": "conv-003",
+      "title": "全自动化升级和UI修正",
+      "project_id": "TASKFLOW",
+      "model": "claude-3-5-sonnet",
+      "status": "completed",
+      "total_tokens": 90000,
+      "messages_count": 45,
+      "created_at": "2025-11-19 04:00:00",
+      "updated_at": "2025-11-19 05:20:00",
+      "participants": ["用户", "架构师AI"],
+      "summary": "实现REQ-009全自动化升级，修复UI显示问题，完成任务派发系统优化。",
+      "messages": [],
+      "tags": ["automation", "ui", "smart-detection"]
+    }
+  ],
+  "stats": {
+    "total_conversations": 3,
+    "active_conversations": 3,
+    "total_tokens": 315000,
+    "total_messages": 162,
+    "last_updated": "2025-11-19T05:20:00"
+  }
+}

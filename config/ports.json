@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "port_range": {
+    "start": 8870,
+    "end": 8899
+  },
+  "allocated_ports": {
+    "TASKFLOW": {
+      "port": 8870,
+      "allocated_at": "2025-11-18T16:36:39.632239",
+      "status": "active"
+    },
+    "TEST_PROJECT": {
+      "port": 8871,
+      "allocated_at": "2025-11-18T16:36:40.642580",
+      "status": "active"
+    }
+  },
+  "history": [
+    {
+      "action": "allocate",
+      "project_code": "TASKFLOW",
+      "port": 8870,
+      "timestamp": "2025-11-18T16:36:39.632266"
+    },
+    {
+      "action": "allocate",
+      "project_code": "TEST_PROJECT",
+      "port": 8871,
+      "timestamp": "2025-11-18T16:36:40.642589"
+    }
+  ]
+}

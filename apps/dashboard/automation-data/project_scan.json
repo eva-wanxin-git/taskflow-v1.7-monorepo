@@ -1,0 +1,139 @@
+{
+  "scan_time": "2025-11-18T18:39:18.166770",
+  "project_path": "C:\\Users\\Administrator\\Desktop\\cursor工作盘\\taskflow-v1.7-monorepo\\apps\\dashboard",
+  "project_name": "",
+  "project_type": "未知类型",
+  "files_count": {
+    "python": 28,
+    "javascript": 0,
+    "typescript": 0,
+    "markdown": 81,
+    "json": 15,
+    "yaml": 0,
+    "total": 124
+  },
+  "technologies": [
+    "未识别"
+  ],
+  "features": {
+    "implemented": [
+      {
+        "name": "API接口 - knowledge_base_initializer",
+        "file": "src\\automation\\knowledge_base_initializer.py",
+        "type": "后端API",
+        "status": "已实现"
+      },
+      {
+        "name": "API接口 - project_scanner",
+        "file": "src\\automation\\project_scanner.py",
+        "type": "后端API",
+        "status": "已实现"
+      },
+      {
+        "name": "StateManagerAdapter类",
+        "file": "src\\industrial_dashboard\\adapters.py",
+        "type": "核心模块",
+        "status": "已实现"
+      },
+      {
+        "name": "DataProvider类",
+        "file": "src\\industrial_dashboard\\data_provider.py",
+        "type": "核心模块",
+        "status": "已实现"
+      }
+    ],
+    "partial": [
+      {
+        "name": "检查TODO/FIXME标记",
+        "file": "src\\automation\\project_scanner.py",
+        "line": 232,
+        "type": "待完善",
+        "status": "部分实现"
+      },
+      {
+        "name": "if \"TODO\" in line or \"FIXME\" in line:",
+        "file": "src\\automation\\project_scanner.py",
+        "line": 241,
+        "type": "待完善",
+        "status": "部分实现"
+      },
+      {
+        "name": "\"name\": line.strip().replace('', '').replace('', '",
+        "file": "src\\automation\\project_scanner.py",
+        "line": 243,
+        "type": "待完善",
+        "status": "部分实现"
+      },
+      {
+        "name": "{\"name\": \"ArchitectOrchestrator数据库集成\", \"file\": \"ap",
+        "file": "src\\industrial_dashboard\\dashboard.py",
+        "line": 246,
+        "type": "待完善",
+        "status": "部分实现"
+      },
+      {
+        "name": "//  调用API拆解任务",
+        "file": "src\\industrial_dashboard\\templates.py",
+        "line": 4009,
+        "type": "待完善",
+        "status": "部分实现"
+      },
+      {
+        "name": "//  调用API保存选中的Bug",
+        "file": "src\\industrial_dashboard\\templates.py",
+        "line": 4429,
+        "type": "待完善",
+        "status": "部分实现"
+      },
+      {
+        "name": "//  调用API保存Bug报告",
+        "file": "src\\industrial_dashboard\\templates.py",
+        "line": 4525,
+        "type": "待完善",
+        "status": "部分实现"
+      },
+      {
+        "name": "//  刷新Bug列表",
+        "file": "src\\industrial_dashboard\\templates.py",
+        "line": 4531,
+        "type": "待完善",
+        "status": "部分实现"
+      }
+    ],
+    "conflicts": [
+      {
+        "name": "重复文件名: __init__.py",
+        "files": [
+          "src\\automation\\__init__.py",
+          "src\\industrial_dashboard\\__init__.py"
+        ],
+        "type": "命名冲突",
+        "suggestion": "建议重命名或合并"
+      },
+      {
+        "name": "重复文件名: __init__.py",
+        "files": [
+          "src\\automation\\__init__.py",
+          "src\\automation\\utils\\__init__.py"
+        ],
+        "type": "命名冲突",
+        "suggestion": "建议重命名或合并"
+      }
+    ]
+  },
+  "structure": {
+    "has_tests": false,
+    "has_docs": false,
+    "has_config": false,
+    "has_api": false,
+    "has_database": false
+  },
+  "knowledge_base": {
+    "status": "success",
+    "created_dirs": 0,
+    "created_files": 0,
+    "dirs": [],
+    "files": [],
+    "initialized_at": "2025-11-18T18:39:18.193436"
+  }
+}

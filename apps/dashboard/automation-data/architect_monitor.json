@@ -1,0 +1,37 @@
+{
+  "token_usage": {
+    "used": 299000,
+    "total": 1000000,
+    "percentage": 29.9,
+    "sessions": [
+      {
+        "timestamp": "2025-11-18 21:39:51",
+        "tokens": 115000,
+        "event": "手动同步",
+        "conversation_id": "manual-sync-1763473191578",
+        "sync_type": "manual"
+      }
+    ]
+  },
+  "status": {
+    "text": "✅ 工作完成",
+    "reviewed_count": 10,
+    "current_task": "收尾和运维记录",
+    "completion_rate": 1.0,
+    "last_update": "2025-11-19 00:20:00"
+  },
+  "project_info": {
+    "name": "任务所·Flow v1.7",
+    "code": "TASKFLOW",
+    "completion": 60.0,
+    "total_features": 108,
+    "pending_tasks": 22,
+    "architect_status": "✅ 活跃中",
+    "completed_tasks": 14,
+    "completion_rate": 38.9,
+    "cancelled_tasks": 2,
+    "total_tasks": 36
+  },
+  "prompt": "# 🏛️ 企业级架构师AI · System Prompt\n\n**版本**: v3.0 Expert Level\n**经验**: Staff/Principal Engineer (10-15年)\n\n完整内容请在Dashboard的「动态提示词」Tab查看，或访问:\ndocs/ai/architect-system-prompt-expert.md\n\n核心特点:\n- ✅ 深度理解优于执行\n- ✅ 质疑优于盲从\n- ✅ 必须提供3个方案对比\n- ✅ 长期视角(1-3年)\n- ✅ Token高效使用策略",
+  "events": []
+}
