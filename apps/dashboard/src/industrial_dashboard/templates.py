@@ -5145,12 +5145,40 @@ AI代码管家等待您的提问...
         }}
         
         function renderTaskButton(task) {{
-            if (task.status === 'completed') {{
-                return `<button class="copy-report-button" onclick="copyTaskReport('${{task.id}}', event)">▸ 复制报告</button>`;
-            }} else if (task.status === 'pending') {{
-                return `<button class="copy-prompt-button" onclick="copyTaskPrompt('${{task.id}}', event)">▸ 复制提示词</button>`;
+            // 三态按钮逻辑：pending → in_progress → completed
+            if (task.status === 'pending') {{
+                // 待处理：显示"📋 一键复制提示词"
+                return `
+                    <button
+                        onclick="copyTaskPrompt('${{task.id}}')"
+                        style="padding: 6px 12px; background: var(--blue); color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600; transition: all 0.2s;"
+                        onmouseover="this.style.background='var(--red)'"
+                        onmouseout="this.style.background='var(--blue)'"
+                        title="复制完整任务提示词到剪贴板"
+                    >
+                        📋 一键复制提示词
+                    </button>
+                `;
+            }} else if (task.status === 'completed') {{
+                // 已完成：显示"📄 一键复制完成报告"
+                return `
+                    <button
+                        onclick="copyTaskReport('${{task.id}}')"
+                        style="padding: 6px 12px; background: var(--blue); color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600; transition: all 0.2s;"
+                        onmouseover="this.style.background='var(--red)'"
+                        onmouseout="this.style.background='var(--blue)'"
+                        title="复制完成报告模板到剪贴板"
+                    >
+                        📄 一键复制完成报告
+                    </button>
+                `;
             }} else if (task.status === 'in_progress') {{
-                return `<button class="redispatch-button" onclick="redispatchTask('${{task.id}}', event)">↻ 重新派发</button>`;
+                // 进行中：显示"⚙️ 开发中"状态标签
+                return `
+                    <span style="padding: 6px 12px; background: #FEF3C7; color: #92400E; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                        ⚙️ 开发中
+                    </span>
+                `;
             }}
             return '';
         }}
